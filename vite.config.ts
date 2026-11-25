@@ -1,5 +1,6 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
+import fs from 'fs';
 import path from 'path';
 import {defineConfig} from 'vite';
 
@@ -57,6 +58,21 @@ export default defineConfig(() => {
                 res.end(JSON.stringify({ ok: false, description: err?.message || 'Telegram proxy error' }));
               }
             });
+          });
+
+          server.middlewares.use('/api/download-launcher', (_req, res) => {
+            const launcherPath = path.resolve(__dirname, 'MatchPulse.bat');
+            if (!fs.existsSync(launcherPath)) {
+              res.statusCode = 404;
+              res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+              res.end('MatchPulse.bat не найден. Выполните npm run build.');
+              return;
+            }
+            const fileBuf = fs.readFileSync(launcherPath);
+            res.setHeader('Content-Type', 'application/octet-stream');
+            res.setHeader('Content-Disposition', 'attachment; filename="MatchPulse.bat"');
+            res.setHeader('Content-Length', String(fileBuf.length));
+            res.end(fileBuf);
           });
         }
       }

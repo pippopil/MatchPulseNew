@@ -9,7 +9,8 @@ import {
   ShieldCheck, 
   Activity, 
   Radio,
-  Send
+  Send,
+  MonitorDown
 } from 'lucide-react';
 
 import { DataSourceType } from '../types/football';
@@ -192,12 +193,23 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Export CSV Button */}
             <button
               onClick={onExportCSV}
-              className="px-2.5 py-1.5 text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors border border-neutral-200 dark:border-neutral-700 flex items-center gap-1.5"
+              className="px-2.5 py-1.5 text-xs font-medium text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors border border-neutral-200 dark:border-neutral-700 flex items-center gap-1.5 whitespace-nowrap shrink-0"
               title="Экспорт аналитической выборки в CSV"
             >
               <Download className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">CSV</span>
             </button>
+
+            {/* Download Standalone Single-File Launcher for PC */}
+            <a
+              href="/api/download-launcher"
+              download="MatchPulse.bat"
+              className="px-2.5 py-1.5 text-xs font-medium text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 rounded-lg transition-colors border border-emerald-200 dark:border-emerald-800 flex items-center gap-1.5 whitespace-nowrap shrink-0"
+              title="Скачать один автономный файл MatchPulse.bat для запуска локально на ПК"
+            >
+              <MonitorDown className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">ПК (.bat)</span>
+            </a>
 
             {/* Dark / Light Mode Toggle */}
             <button
