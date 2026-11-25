@@ -1,5 +1,17 @@
 import { MatchAnalysis, GoalInterval, TeamFormStats, H2HSummary, DataSourceType, MatchStatus } from '../types/football';
 
+// Универсальный fetch: на сервере обращается напрямую, в браузере (Zero-Node.js режим) идет через локальный /api/proxy
+async function smartFetch(url: string, init?: RequestInit): Promise<Response> {
+  if (typeof window !== 'undefined') {
+    const proxyUrl = `/api/proxy?url=${encodeURIComponent(url)}`;
+    return fetch(proxyUrl, {
+      method: 'GET',
+      signal: init?.signal
+    });
+  }
+  return fetch(url, init);
+}
+
 // Comprehensive dictionary for country names in Russian
 const COUNTRY_RU: Record<string, string> = {
   // Western & Southern Europe
@@ -429,7 +441,7 @@ export async function parseFlashscoreFeed(): Promise<MatchAnalysis[]> {
 
   for (const url of feedUrls) {
     try {
-      const res = await fetch(url, {
+      const res = await smartFetch(url, {
         headers: {
           'x-fsign': 'SW9D1eZo',
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
@@ -719,7 +731,7 @@ export async function parseLiveScoreFeed(): Promise<MatchAnalysis[]> {
 
   for (const url of urls) {
     try {
-      const res = await fetch(url, {
+      const res = await smartFetch(url, {
         headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
         signal: AbortSignal.timeout(4000)
       });
@@ -955,7 +967,7 @@ export async function parseESPNFeed(): Promise<MatchAnalysis[]> {
   for (const lg of leagues) {
     try {
       const url = `https://site.api.espn.com/apis/site/v2/sports/soccer/${lg.slug}/scoreboard`;
-      const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: AbortSignal.timeout(3500) });
+      const res = await smartFetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, signal: AbortSignal.timeout(3500) });
       if (!res.ok) continue;
       const data = await res.json();
       for (const ev of data.events || []) {
